@@ -71,7 +71,8 @@ get_cephadm () {
 
 
 check_cephadm () {
-  if [[ $(which cephadm) == '/usr/sbin/cephadm' ]]; then
+  CEPHADM_PATH=$(which cephadm) 
+  if [[ ${CEPHADM_PATH} == '/usr/sbin/cephadm' || ${CEPHADM_PATH} == '/usr/local/sbin/cephadm' ]]; then
     echo 'cephadm has been installed correctly'
   else 
     echo 'cephadm did not install correctly'
