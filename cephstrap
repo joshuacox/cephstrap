@@ -51,7 +51,7 @@ install_docker_debian_like () {
 
 fix_apt_key () {
   cd $TMP
-  curl -O $TMP/release.asc https://download.ceph.com/keys/release.asc
+  curl -o $TMP/release.asc https://download.ceph.com/keys/release.asc
   apt-key add $TMP/release.asc
   rm $TMP/release.asc
   apt-get update -qq
