@@ -1,0 +1,91 @@
+#!/bin/sh
+CEPH_RELEASE=octopus
+TMP=$(mktemp -d suffix=.cephstrap)
+. /etc/os-release
+
+test_docker () {
+  which docker
+  if [[ $? == 1 ]]; then
+    echo 'Docker is not installed, do you wish for me to install it for you?'
+    read -t 60 -p 'Continue and install docker? (y/n): ' to_install_docker
+    if [[ $to_install_docker == 'y' ]]; then
+      # install_docker
+      if [[ $ID == "debian" || $ID == "ubuntu"  ]]; then
+        install_docker_debian_like
+			else
+				echo 'Distro not supported yet, exiting'
+				exit 1
+      fi
+    else
+      echo 'exiting...'
+      exit 1
+    fi
+  fi
+}
+
+install_docker_debian_like () {
+  # These are the official steps for debian / ubuntu combined
+  # https://docs.docker.com/engine/install/debian/
+
+  sudo apt-get -yqq remove docker docker-engine docker.io containerd runc
+	sudo apt-get update -qq
+	sudo apt-get install -yqq \
+		ca-certificates \
+		curl \
+		gnupg \
+		lsb-release
+
+  # ID will be either debian or ubuntu
+	curl -fsSL https://download.docker.com/linux/${ID}/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+	echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/${ID} $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+	sudo apt-get update -qq
+	sudo apt-get install -yqq docker-ce docker-ce-cli containerd.io
+}
+
+fix_apt_key () {
+  cd $TMP
+  curl -O $TMP/release.asc https://download.ceph.com/keys/release.asc
+  apt-key add release.asc
+  rm $TMP/release.asc
+  apt-get update -qq
+}
+
+
+get_cephadm () {
+  cd $TMP
+  curl --silent --remote-name --location https://github.com/ceph/ceph/raw/${CEPH_RELEASE}/src/cephadm/cephadm
+  chmod +x cephadm
+  ./cephadm add-repo --release ${CEPH_RELEASE}
+  ./cephadm install
+}
+
+
+check_cephadm () {
+  if [[ $(which cephadm) == '/usr/sbin/cephadm' ]]; then
+    echo 'cephadm has been installed correctly'
+  else 
+    echo 'cephadm did not install correctly'
+    exit 1
+  fi
+}
+
+do_debian_like () {
+  test_docker
+  fix_apt_key
+  get_cephadm
+  check_cephadm
+}
+
+main () {
+	if [[ $PRETTY_NAME == "Debian GNU/Linux 10 (buster)" ]]; then
+		do_debian_like
+	elif [[ $PRETTY_NAME == "Ubuntu 18.04.6 LTS" ]]; then
+		do_debian_like
+	else
+		echo 'Distro not supported yet, exiting'
+		exit 1
+	fi
+}
+
+main $@
