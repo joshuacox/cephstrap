@@ -1,4 +1,6 @@
 #!/bin/bash
+echo 'Starting cephstrap --> https://github.com/joshuacox/cephstrap'
+sleep 1
 . /etc/os-release
 : ${CEPH_RELEASE:=octopus}
 
@@ -50,6 +52,7 @@ install_docker_debian_like () {
 }
 
 fix_apt_key () {
+  # https://tracker.ceph.com/issues/45009
   cd $TMP
   curl -o $TMP/release.asc https://download.ceph.com/keys/release.asc
   apt-key add $TMP/release.asc

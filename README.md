@@ -1,6 +1,10 @@
 # cephstrap
 
-By  default this install cephadm from the octopus release. This can be changed by defining an environment variable:
+This follows the 
+[official docs](https://docs.ceph.com/en/pacific/cephadm/install/#install-cephadm)
+on using cephadm.
+
+By  default this installs cephadm from the octopus release. This can be changed by defining an environment variable:
 
 ```
 export CEPH_RELEASE=nautilus
