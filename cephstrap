@@ -1,7 +1,13 @@
 #!/bin/bash
-CEPH_RELEASE=octopus
-TMP=$(mktemp -d suffix='.cephstrap')
 . /etc/os-release
+: ${CEPH_RELEASE:=octopus}
+
+# TMP
+TMP=$(mktemp -d suffix='.cephstrap')
+cleanup () {
+  rm -Rf ${TMP}
+}
+trap cleanup EXIT
 
 test_docker () {
   which docker
