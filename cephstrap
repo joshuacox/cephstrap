@@ -3,7 +3,7 @@
 : ${CEPH_RELEASE:=octopus}
 
 # TMP
-TMP=$(mktemp -d suffix='.cephstrap')
+TMP=$(mktemp -d)
 cleanup () {
   rm -Rf ${TMP}
 }
