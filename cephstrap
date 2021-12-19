@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 CEPH_RELEASE=octopus
-TMP=$(mktemp -d suffix=.cephstrap)
+TMP=$(mktemp -d suffix='.cephstrap')
 . /etc/os-release
 
 test_docker () {
